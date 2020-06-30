@@ -2,7 +2,7 @@
 #define _scheduler_H
 
 #include "ischeduler.h"
-
+#include <stdint.h>
 
 ischeduler_st* scheduler_init(scheduler_HAL_st *ptr);
 
