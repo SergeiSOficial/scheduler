@@ -15,9 +15,9 @@
 #define scheduler_HAL_st watimer_HAL_st
 #endif
 
+#define MILLISECONDS(x) (x)
 
-
-typedef struct 
+typedef struct
 {
   void (* __scheduler_run_callbacks)(void);
   void (* __scheduler_add_task)(struct scheduler_desc *, scheduler_desc_handler_t, uint8_t, uint32_t);
