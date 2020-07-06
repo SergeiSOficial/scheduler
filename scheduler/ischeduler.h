@@ -15,7 +15,9 @@
 #define scheduler_HAL_st watimer_HAL_st
 #endif
 
+#ifndef MILLISECONDS
 #define MILLISECONDS(x) (x)
+#endif
 
 typedef struct
 {

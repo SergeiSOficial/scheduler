@@ -4,7 +4,10 @@
 #include "libmf\libmfwtimer.h"
 
 #define SECONDS(x) 		((uint32_t)(x) * 1000)
+#ifndef MILLISECONDS
 #define MILLISECONDS(x) (SECONDS(x) / 1000)
+#endif
+
 
 #define ABSOLUTE    0
 #define RELATIVE    1
@@ -40,14 +43,14 @@ extern uint8_t wtimer0_removecb_core(struct wtimer_desc *desc);
 uint8_t wtimer_idle(uint8_t flags);
 
 
-typedef struct 
+typedef struct
 {
   void (* __global_irq_enable)(void);
   void (* __global_irq_disable)(void);
   void (* __cc_irq_enable)(uint8_t chan);
   void (* __cc_irq_disable)(uint8_t chan);
   void (* __loop_irq_enable)(void);
-  void (* __loop_irq_disable)(void); 
+  void (* __loop_irq_disable)(void);
   void (* __cc_set)(uint8_t chan, uint16_t data);
   uint16_t (* __cc_get)(uint8_t chan);
   uint16_t (* __cnt_get)(uint8_t chan);
