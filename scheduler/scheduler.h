@@ -6,6 +6,8 @@
 
 ischeduler_st* scheduler_init(scheduler_HAL_st *ptr);
 
+_Bool scheduler_check(struct scheduler_desc *desc);
+
 void scheduler_irq();
 
 void scheduler_run_callbacks();

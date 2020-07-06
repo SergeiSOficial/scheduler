@@ -3,11 +3,20 @@
 
 ischeduler_st scheduler_inst;
 
+_Bool scheduler_check(struct scheduler_desc *desc)
+{
+  #ifdef WTIMER
+  return CheckTask(desc);
+  #else
+  return watimer_check_callback(desc);
+  #endif
+}
+
 void scheduler_irq()
 {
   #ifdef WTIMER
   wtimer_cc0_irq();
-  #else   
+  #else
   watimer_irq();
   #endif
 }
@@ -72,11 +81,11 @@ ischeduler_st* scheduler_init(scheduler_HAL_st *ptr)
   #ifdef WTIMER
   wtimer_set_HAL(ptr);
   wtimer_init();
-  #else 
+  #else
   watimer_set_HAL(ptr);
   watimer_init();
   #endif
-  
+
   scheduler_inst.__scheduler_add_task = &scheduler_add_task;
   scheduler_inst.__scheduler_run_callbacks = &scheduler_run_callbacks;
   scheduler_inst.__scheduler_remove_task = &scheduler_remove_task;
