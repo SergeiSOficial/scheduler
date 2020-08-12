@@ -121,7 +121,7 @@ void watimer_init(void)
 
 void watimer_irq(void)
 {
-    //watimer_configure_next_irq_time();
+    watimer_configure_next_irq_time();
     watimer_run_callbacks();
 }
 
