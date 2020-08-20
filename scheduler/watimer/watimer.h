@@ -2,6 +2,9 @@
 #define WATIMER_H
 
 #include <stdint.h>
+#ifdef USE_RTC_WATIMER
+#include <time.h>
+#endif //USE_RTC_WATIMER
 
 extern volatile uint32_t watimer_time;
 
@@ -40,9 +43,15 @@ typedef struct
   void (* __cc_irq_disable)(uint8_t chan);
   void (* __loop_irq_enable)(void);
   void (* __loop_irq_disable)(void);
+#ifdef USE_RTC_WATIMER
+  void (* __cc_set)(uint8_t chan, time_t data);
+  time_t (* __cc_get)(uint8_t chan);
+  time_t (* __cnt_get)(uint8_t chan);
+#else
   void (* __cc_set)(uint8_t chan, uint16_t data);
   uint16_t (* __cc_get)(uint8_t chan);
   uint16_t (* __cnt_get)(uint8_t chan);
+#endif //USE_RTC_WATIMER
   uint8_t (* __check_cc_irq)(uint8_t chan);
 }watimer_HAL_st;
 
