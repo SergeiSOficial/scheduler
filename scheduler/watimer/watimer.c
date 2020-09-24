@@ -2,7 +2,7 @@
 #include "ischeduler.h"
 #include "watimer\watimer.h"
 
-volatile uint32_t watimer_time;
+volatile time_t watimer_time;
 
 volatile uint8_t callbacks_num;
 
@@ -15,7 +15,7 @@ void watimer_set_HAL(watimer_HAL_st *ptr)
     watimer_hal = ptr;
 }
 
-uint32_t watimer_update_time()
+time_t watimer_update_time()
 {
 #ifdef USE_RTC_WATIMER
 //    static time_t oldWatimerTime = 0;
@@ -26,7 +26,7 @@ uint32_t watimer_update_time()
     watimer_time = watimer_hal->__cnt_get(0);
     return watimer_time;
 #else
-    static uint32_t old_watimer_time = 0;
+    static time_t old_watimer_time = 0;
 
     watimer_time &= 0xffff0000;
     watimer_time += watimer_hal->__cnt_get(0);
@@ -45,7 +45,7 @@ static void watimer_update_callbacks()
     {
         if (watimer_callbacks[i])
         {
-            if ((watimer_callbacks[i]->timeout == 0) && (watimer_time - watimer_callbacks[i]->timer < 0x80000000))
+            if ((watimer_callbacks[i]->timeout == 0) && (watimer_time - watimer_callbacks[i]->timer <= 0))
             {
                 if (watimer_callbacks[i]->level == RUN_CONTINUOSLY_RELATIVE)
                     watimer_callbacks[i]->timer = watimer_time + watimer_callbacks[i]->period;
@@ -58,7 +58,7 @@ static void watimer_update_callbacks()
 static _Bool watimer_configure_next_irq_time()
 {
 
-    uint32_t irq_time = 0xffffffff;
+    time_t irq_time = 0x0fffffffffffffff;
     _Bool pending = 0;
     _Bool timeout = 0;
     watimer_update_callbacks();
@@ -85,21 +85,21 @@ static _Bool watimer_configure_next_irq_time()
         //   if(watimer_time == 3085)
         //   watimer_time++;
         //if(((irq_time&0xffff) - ((watimer_time + MILLISECONDS(5))&0xffff)) < 0x8000)
-        if (irq_time > (watimer_time + MILLISECONDS(5)))
+        if (irq_time > (watimer_time + MILLISECONDS(50)))
         {
-            watimer_hal->__cc_set(0, irq_time & 0xffff);
+            watimer_hal->__cc_set(0, irq_time);
         }
         else
         {
             if (!watimer_hal->__check_cc_irq(0))
             {
-                watimer_hal->__cc_set(0, watimer_hal->__cnt_get(0) + MILLISECONDS(5));
+                watimer_hal->__cc_set(0, watimer_hal->__cnt_get(0) + MILLISECONDS(50));
             }
             else
             {
                 watimer_hal->__cc_irq_disable(0);
                 watimer_hal->__cc_irq_enable(0);
-                watimer_hal->__cc_set(0, watimer_hal->__cnt_get(1) + MILLISECONDS(5));
+                watimer_hal->__cc_set(0, watimer_hal->__cnt_get(1) + MILLISECONDS(50));
             }
         }
     }
@@ -154,7 +154,11 @@ void watimer_run_callbacks()
         }
     }
     if (watimer_configure_next_irq_time())
-        watimer_run_callbacks();
+        {
+            watimer_hal->__cc_set(0, watimer_hal->__cnt_get(0) + MILLISECONDS(500));
+            //watimer_run_callbacks();
+        }
+
     watimer_hal->__global_irq_enable();
 }
 uint16_t diff;
@@ -170,7 +174,7 @@ _Bool watimer_can_sleep()
     return (!soon);
 }
 
-void watimer_add_callback(struct watimer_callback_st *desc, watimer_callback_func cb, watimer_run_mode_en run_level, uint32_t period)
+void watimer_add_callback(struct watimer_callback_st *desc, watimer_callback_func cb, watimer_run_mode_en run_level, time_t period)
 {
     watimer_hal->__global_irq_disable();
     uint8_t p;
