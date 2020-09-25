@@ -45,7 +45,7 @@ static void watimer_update_callbacks()
     {
         if (watimer_callbacks[i])
         {
-            if ((watimer_callbacks[i]->timeout == 0) && (watimer_time >= watimer_callbacks[i]->timer))
+            if ((watimer_callbacks[i]->timeout == 0) && (watimer_time + MILLISECONDS(50) >= watimer_callbacks[i]->timer))
             {
                 if (watimer_callbacks[i]->level == RUN_CONTINUOSLY_RELATIVE)
                     watimer_callbacks[i]->timer = watimer_time + watimer_callbacks[i]->period;
