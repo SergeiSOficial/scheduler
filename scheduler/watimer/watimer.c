@@ -45,7 +45,7 @@ static void watimer_update_callbacks()
     {
         if (watimer_callbacks[i])
         {
-            if ((watimer_callbacks[i]->timeout == 0) && (watimer_time - watimer_callbacks[i]->timer <= 0))
+            if ((watimer_callbacks[i]->timeout == 0) && (watimer_time >= watimer_callbacks[i]->timer))
             {
                 if (watimer_callbacks[i]->level == RUN_CONTINUOSLY_RELATIVE)
                     watimer_callbacks[i]->timer = watimer_time + watimer_callbacks[i]->period;
@@ -118,7 +118,7 @@ void watimer_init(void)
         while (1)
             ; //HAL struct must be configured before library usage
     watimer_time = watimer_hal->__cnt_get(0);
-    callbacks_num = 0;
+    callbacks_num = MAXCALLBACKS-1;
     memset(((uint8_t *)(&watimer_callbacks[0])), 0, sizeof(watimer_callbacks));
 }
 
@@ -194,7 +194,7 @@ void watimer_add_callback(struct watimer_callback_st *desc, watimer_callback_fun
             while (1)
                 ; //halt on callbacks buffer overflow
         }
-        callbacks_num++;
+        //callbacks_num++;
     }
     watimer_callbacks[p] = desc;
     if (cb)
@@ -216,8 +216,8 @@ void watimer_remove_callback(struct watimer_callback_st *desc)
         if (watimer_callbacks[p] == desc)
         {
             watimer_callbacks[p] = 0;
-            if (p == (callbacks_num - 1))
-                callbacks_num--;
+//            if (p == (callbacks_num - 1))
+//                callbacks_num--;
             break;
         }
     watimer_configure_next_irq_time();
