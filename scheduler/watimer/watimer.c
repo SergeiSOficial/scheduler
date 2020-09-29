@@ -18,10 +18,10 @@ void watimer_set_HAL(watimer_HAL_st *ptr)
 time_t watimer_update_time()
 {
 #ifdef USE_RTC_WATIMER
-//    static time_t oldWatimerTime = 0;
-//    time_t newWatimerTime = watimer_hal->__cnt_get(0);
-//    watimer_time += newWatimerTime - oldWatimerTime;
-//    oldWatimerTime = newWatimerTime;
+    //    static time_t oldWatimerTime = 0;
+    //    time_t newWatimerTime = watimer_hal->__cnt_get(0);
+    //    watimer_time += newWatimerTime - oldWatimerTime;
+    //    oldWatimerTime = newWatimerTime;
 
     watimer_time = watimer_hal->__cnt_get(0);
     return watimer_time;
@@ -118,8 +118,8 @@ void watimer_init(void)
         while (1)
             ; //HAL struct must be configured before library usage
     watimer_time = watimer_hal->__cnt_get(0);
-    callbacks_num = MAXCALLBACKS-1;
-    memset(((uint8_t *)(&watimer_callbacks[0])), 0, sizeof(watimer_callbacks));
+    callbacks_num = MAXCALLBACKS - 1;
+    memset_s(((uint8_t *)(&watimer_callbacks[0])), sizeof(watimer_callbacks), 0, sizeof(watimer_callbacks));
 }
 
 void watimer_irq(void)
@@ -154,10 +154,10 @@ void watimer_run_callbacks()
         }
     }
     if (watimer_configure_next_irq_time())
-        {
-            watimer_hal->__cc_set(0, watimer_hal->__cnt_get(0) + MILLISECONDS(500));
-            //watimer_run_callbacks();
-        }
+    {
+        watimer_hal->__cc_set(0, watimer_hal->__cnt_get(0) + MILLISECONDS(50));
+        //watimer_run_callbacks();
+    }
 
     watimer_hal->__global_irq_enable();
 }
@@ -216,8 +216,8 @@ void watimer_remove_callback(struct watimer_callback_st *desc)
         if (watimer_callbacks[p] == desc)
         {
             watimer_callbacks[p] = 0;
-//            if (p == (callbacks_num - 1))
-//                callbacks_num--;
+            //            if (p == (callbacks_num - 1))
+            //                callbacks_num--;
             break;
         }
     watimer_configure_next_irq_time();
