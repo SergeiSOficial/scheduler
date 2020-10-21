@@ -6,7 +6,7 @@
 #include <time.h>
 #endif //USE_RTC_WATIMER
 
-extern volatile uint32_t watimer_time;
+extern volatile time_t watimer_time;
 
 
 typedef enum{RUN_SINGLE_ABSOLUTE, RUN_SINGLE_RELATIVE, RUN_CONTINUOSLY_RELATIVE} watimer_run_mode_en;
@@ -21,8 +21,8 @@ typedef void(*watimer_callback_func)(struct watimer_callback_st *desc);
 struct watimer_callback_st
 {
 	watimer_run_mode_en	level;
-	uint32_t 		period;
-	uint32_t		timer;
+	time_t 		period;
+	time_t		timer;
 	watimer_callback_func func;
 	uint8_t 	timeout;
 };
@@ -31,7 +31,7 @@ struct watimer_callback_st
 #define MAXCALLBACKS    20
 
 
-#define SECONDS(x) ((uint32_t)(x) * 1000)
+#define SECONDS(x) ((time_t)(x) * 1000)
 
 
 
@@ -65,11 +65,11 @@ void watimer_init(void);
 //void watimer_reg_func(uint8_t name, void *fn);
 void watimer_irq(void);
 void watimer_run_callbacks();
-void watimer_add_callback(struct watimer_callback_st *desc, watimer_callback_func cb, watimer_run_mode_en run_level, uint32_t period);
+void watimer_add_callback(struct watimer_callback_st *desc, watimer_callback_func cb, watimer_run_mode_en run_level, time_t period);
 void watimer_remove_callback(struct watimer_callback_st *desc);
 _Bool watimer_check_callback(struct watimer_callback_st *desc);
 _Bool watimer_can_sleep();
-uint32_t watimer_update_time();
+time_t watimer_update_time();
 
 
 #endif //WATIMER_H
