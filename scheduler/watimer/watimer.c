@@ -85,6 +85,7 @@ static _Bool watimer_configure_next_irq_time()
         //   if(watimer_time == 3085)
         //   watimer_time++;
         //if(((irq_time&0xffff) - ((watimer_time + MILLISECONDS(5))&0xffff)) < 0x8000)
+        watimer_time = watimer_hal->__cnt_get(0);
         if (irq_time > (watimer_time + MILLISECONDS(50)))
         {
             watimer_hal->__cc_set(0, irq_time);
